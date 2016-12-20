@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * Library functions
  *
@@ -21,7 +21,7 @@
  * @copyright 2014 Davo Smith, Synergy Learning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
@@ -200,7 +200,7 @@ class local_wikiexport {
 
                 // Export successful - update the queue.
                 self::remove_from_queue($subwiki);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 print_r($e);
                 print_r($subwiki);
             }
@@ -387,6 +387,10 @@ class local_wikiexport {
 
         // Remove any 'edit' links.
         $page->content = preg_replace('|<a href="edit\.php.*?\[edit\]</a>|', '', $page->content);
+        $page->content = preg_replace('|<a href="edit\.php.*?\[Bearbeiten\]</a>|', '', $page->content);
+        $page->content = preg_replace('|<a href="edit\.php.*?\[modifica\]</a>|', '', $page->content);
+        $page->content = preg_replace('|<a href="edit\.php.*?\[Modifier\]</a>|', '', $page->content);
+        $page->content = preg_replace('|<a href="edit\.php.*?\[Editar\]</a>|', '', $page->content);
     }
 
     protected function start_export($download) {
@@ -508,17 +512,17 @@ class local_wikiexport {
         $imgel = html_writer::empty_tag('img', array('src' => $img, 'style' => 'max-width: 90%;'));
         $html .= html_writer::div($imgel, 'fronttitle', array('style' => 'text-align: center; padding: 1em 0;'));
         $html .= html_writer::div(' ', 'fronttitletop', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: #b8cce4; margin-top: 1em;'));
-        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: #4f81bd;
+                                                                               background-color: #4b647d; margin-top: 1em;'));
+        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: #ffffff;
                                                                   min-height: 2em; text-align: center; padding-top: 0.5em;
                                                                   size: 1em; margin: 0;' ));
         $html .= html_writer::div(' ', 'fronttitlebottom', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: #4bacc6; margin-bottom: 1em;'));
+                                                                               background-color: #4b647d; margin-bottom: 1em;'));
         $html .= html_writer::div($description, 'frontdescription', array('style' => 'margin: 0.5em 1em;'));
         $html .= html_writer::div($info, 'frontinfo', array('style' => 'margin: 2em 1em'));
 
-        $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
-                                                                       width: 90%;'));
+        // $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
+                                  // width: 90%;'));
 
         $exp->add_spine_item($html, 'cover.html');
     }
@@ -528,16 +532,17 @@ class local_wikiexport {
 
         $exp->startPage();
         // Rounded rectangle.
-        $exp->RoundedRect(9, 9, 192, 279, 6.5);
+        // $exp->RoundedRect(9, 9, 192, 279, 6.5);
         // Logo.
         $exp->Image($CFG->dirroot.'/local/wikiexport/pix/logo.png', 52, 27, 103, 36);
         // Title bar.
-        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(184, 204, 228));
-        $exp->Rect(9, 90, 192, 30, 'F', array(), array(79, 129, 189));
-        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(75, 172, 198));
+        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(75, 100, 125));
+        $exp->Rect(9, 90, 192, 30, 'F', array(), array(255, 255, 255));
+        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(75, 100, 125));
 
         // Title text.
         $title = $this->wiki->name;
+        $exp->SetFont('freesans', '', 12, '', false);
         $exp->SetFontSize(36);
         $exp->Text(9, 97, $title, false, false, true, 0, 0, 'C', false, '', 1, false, 'T', 'C');
         $exp->SetFontSize(12); // Set back to default.
@@ -900,8 +905,8 @@ class wikiexport_epub extends LuciEPUB {
         return $title;
     }
 
-    public function add_spine_item($data, $href = NULL,
-                                   $fallback = NULL, $properties = NULL) {
+    public function add_spine_item($data, $href = null,
+                                   $fallback = null, $properties = null) {
         if (strpos('<html', $data) === false) {
             $data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE html>
